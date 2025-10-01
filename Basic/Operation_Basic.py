@@ -1,18 +1,41 @@
 
 import torch
 import torch.nn.functional as F
+import numpy as np
 
 def softmax():
     logits = torch.tensor([[2.0, 1.0, 0.1],
-                        [0.5, 2.5, 1.5]])
-
+                           [0.5, 2.5, 1.5]])
+    print("原始logits:", logits)
+    print("\n=== PyTorch计算 ===")
     probs = F.softmax(logits, dim=1)
-    print(probs)
+    print("softmax后的结果:", probs)
     print(probs.sum(dim=1))  # 每一行的和=1
-    print(probs.log())
 
-    logit = torch.tensor([0.659])
-    print(logit.log())
+    print("\n=== NumPy计算 ===")
+    # NumPy计算 - 需要将tensor转换为numpy
+    logits_np = logits.numpy()
+    # 手动计算softmax
+    exp_logits = np.exp(logits_np)
+    sum_exp = np.sum(exp_logits, axis=1, keepdims=True)
+    softmax_np = exp_logits / sum_exp
+    print("NumPy手动计算softmax:", softmax_np)
+    print("每一行的和:", np.sum(softmax_np, axis=1))
+    
+'''
+log_softmax = log(softmax(x))
+'''
+def log_softmax():
+    logits = torch.tensor([[2.0, 1.0, 0.1],
+                           [0.5, 2.5, 1.5]])
+    print("原始logits:", logits)
+    log_probs = F.log_softmax(logits, dim=1)
+    print("log_softmax后的结果:", log_probs)
+    
+    softmax_probs = F.softmax(logits, dim=1)
+    print("softmax后的结果:", softmax_probs)
+    log_softmax_manual = torch.log(softmax_probs)
+    print("手动计算log(softmax)的结果:", log_softmax_manual)
 
 # 归一化
 def normalize():
@@ -66,5 +89,6 @@ def dot_product():
 
 if __name__ == "__main__":
     # softmax()
+    log_softmax()
     # normalize()
-    dot_product()
+    # dot_product()
